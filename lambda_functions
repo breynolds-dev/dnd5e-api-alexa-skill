@@ -261,13 +261,16 @@ function sendApiRequest(resource, target, cardTitle, callback) {
         console.log('found result' + result);
         var speakerCount = result.native_speakers.length;
 
-        if (speakerCount > 0) {
+        if (speakerCount == 1) {
+          languageResult = 'There is one race that natively speaks ' + language + "<break time=\"2ms\"/>" + result.native_speakers[0].race;
+        } else if (speakerCount > 1) {
           languageResult = 'There are ' + speakerCount + ' races that natively speak ' + language + "<break time=\"500ms\"/> ";
 
           for (var i = 0;i < speakerCount;i++) {
             if ((i + 1) == speakerCount) {
               languageResult += ' and '
             }
+
             languageResult += result.native_speakers[i].race + "<break time=\"1ms\"/> ";
           }
         } else {
@@ -408,7 +411,7 @@ function resolveLanguage(language) {
           return collection[x].value;
       }
   }
-  return language || 'Common';
+  return language;
 }
 
 function resolveBook(book) {
@@ -542,42 +545,42 @@ function getScriptureMasteryVerse()
    return collection[Math.round(Math.random() * (collection.length - 1))];
 }
 
-function buildNextSpeechletResponse(title, output, repromptText, shouldEndSession) {
-   return {
-       outputSpeech: {
-           type: "PlainText",
-           text: output  + " To continue say next"
-       },
-       card: {
-           type: "Simple",
-           title: "5e<say-as interpret-as=\"spell-out\">API</say-as> - " + title,
-           content: "" + output
-       },
-       reprompt: {
-           outputSpeech: {
-               type: "PlainText",
-               text: repromptText
-           }
-       },
-       shouldEndSession: shouldEndSession
-   };
+function buildSpeechletResponse(title, output, repromptText, shouldEndSession) {
+  return {
+    outputSpeech: {
+      type: "SSML",
+      ssml: "<speak>" + output + "</speak>"
+    },
+    card: {
+      type: "Simple",
+      title: "5e<say-as interpret-as=\"spell-out\">API</say-as> - " + title,
+      content: output
+    },
+    reprompt: {
+      outputSpeech: {
+        type: "SSML",
+        ssml: "<speak>" + repromptText + "</speak>"
+      }
+    },
+    shouldEndSession: shouldEndSession
+  };
 }
 // --------------- Helpers that build all of the responses -----------------------
 function buildSpeechletResponse(title, output, repromptText, shouldEndSession) {
   return {
     outputSpeech: {
-      type: "PlainText",
-      text: output
+      type: "SSML",
+      ssml: "<speak>" + output + "</speak>"
     },
-      card: {
+    card: {
       type: "Simple",
       title: "5e<say-as interpret-as=\"spell-out\">API</say-as> - " + title,
-      content: "" + output
+      content: output
     },
     reprompt: {
       outputSpeech: {
-        type: "PlainText",
-        text: repromptText
+        type: "SSML",
+        ssml: "<speak>" + repromptText + "</speak>"
       }
     },
     shouldEndSession: shouldEndSession
